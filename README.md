@@ -1,5 +1,6 @@
-yfi provides an unofficial wrapper for the Yahoo Finance API.
 [![Go Reference](https://pkg.go.dev/badge/github.com/cdillond/yfi.svg)](https://pkg.go.dev/github.com/cdillond/yfi)
+
+yfi provides an unofficial wrapper for the Yahoo Finance API.
 
 ### Disclaimer: yfi IS NOT AFFILIATED WITH OR PRODUCED BY YAHOO. DATA OBTAINED THROUGH yfi SHOULD BE USED ONLY FOR PERSONAL, NON-COMMERCIAL APPLICATIONS.
 
