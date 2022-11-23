@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// Tickers represent historical data for a given asset
+// Tickers represent historical data for a given asset.
 type Ticker struct {
 	Symbol           string
 	Interval         TimeSpan
@@ -31,7 +31,7 @@ type burstResp struct {
 	index  int
 }
 
-// save Ticker to .json file
+// Save Ticker to .json file
 func (t *Ticker) ToJson(filename string) error {
 	f, err := os.Create(filename)
 	if err != nil {
@@ -43,7 +43,7 @@ func (t *Ticker) ToJson(filename string) error {
 	return err
 }
 
-// save Ticker to .csv file
+// Save Ticker to .csv file
 func (t *Ticker) ToCsv(filename string) error {
 	f, err := os.Create(filename)
 	if err != nil {
@@ -74,8 +74,8 @@ func (t *Ticker) ToCsv(filename string) error {
 }
 
 // Retrieve historical data for a given ticker.
-// The response is a Ticker and an error
-func (c *Client) TickerHist(ticker string, interval TimeSpan, startDate, endDate time.Time) (Ticker, error) {
+// The response is a Ticker and an error.
+func (c *Client) GetTicker(ticker string, interval TimeSpan, startDate, endDate time.Time) (Ticker, error) {
 	var res Ticker
 	res.Symbol = ticker
 	err := validateInterval(interval)
@@ -162,11 +162,11 @@ func (c *Client) TickerHist(ticker string, interval TimeSpan, startDate, endDate
 
 // Returns historical data for multiple tickers.
 // Each request is followed by a WaitPeriod to reduce the risk of rate limiting.
-// errors are included in each Ticker and are not returned separately
-func (c *Client) TickersHist(tickers []string, interval TimeSpan, startDate, endDate time.Time) []Ticker {
+// errors are included in each Ticker and are not returned separately.
+func (c *Client) GetTickers(tickers []string, interval TimeSpan, startDate, endDate time.Time) []Ticker {
 	res := make([]Ticker, len(tickers))
 	for i := 0; i < len(tickers); i++ {
-		t, err := c.TickerHist(tickers[i], interval, startDate, endDate)
+		t, err := c.GetTicker(tickers[i], interval, startDate, endDate)
 		res[i] = t
 		if c.Verbose {
 			log.Println(tickers[i], i, len(tickers), err)
@@ -176,7 +176,7 @@ func (c *Client) TickersHist(tickers []string, interval TimeSpan, startDate, end
 	return res
 }
 
-// BurstHistoricalData sends requests to the Yahoo Finance API that are spaced
+// GetTickersBurst sends requests to the Yahoo Finance API that are spaced
 // out by the WaitPeriod, regardless of whether reponses to previous
 // requests have been received.
 // No precautions are taken to reduce the risk of rate limiting.
@@ -184,7 +184,7 @@ func (c *Client) TickersHist(tickers []string, interval TimeSpan, startDate, end
 // The context timeout for each request is set to the greater of 30 seconds or the current Client.TimeOut
 // to avoid excessive errors when a large number of requests are made. This behavior can be disabled
 // by setting the Client.HardTimeOut value to true.
-func (c *Client) BurstHistoricalData(tickers []string, interval TimeSpan, startDate, endDate time.Time) []Ticker {
+func (c *Client) GetTickersBurst(tickers []string, interval TimeSpan, startDate, endDate time.Time) []Ticker {
 	res := make([]Ticker, len(tickers))
 	resch := make(chan burstResp, len(tickers))
 
