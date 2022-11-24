@@ -231,7 +231,9 @@ func (c *Client) burstTickerHist(ticker string, interval TimeSpan, startDate, en
 		res.Err = err
 		return burstResp{&res, index}
 	}
-	log.Println(ticker)
+	if c.Verbose {
+		log.Println(ticker)
+	}
 
 	url := V7 + "download/" + ticker +
 		"?period1=" + strconv.Itoa(int(startDate.Unix())) +

@@ -90,8 +90,8 @@ type Quote struct {
 }
 
 // GetQuotes returns a map[string]Quote of all responses
-// provided by the Yahoo Finance API, which silently ignores
-// queries for invalid symbols
+// provided by the Yahoo Finance API. The API silently ignores
+// queries for invalid symbols.
 func (c *Client) GetQuotes(symbols []string) (map[string]Quote, error) {
 	res := make(map[string]Quote, len(symbols))
 	if len(symbols) <= 2500 {
