@@ -16,7 +16,7 @@ import (
 type Ticker struct {
 	Symbol           string
 	Interval         TimeSpan
-	HistoricDates    []int64 //[]time.Time
+	HistoricDates    []int64
 	HistoricOpen     []float64
 	HistoricHigh     []float64
 	HistoricLow      []float64

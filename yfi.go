@@ -9,7 +9,6 @@
 // 1. Ticker contains historical data in a simple and straightforward manner
 // 2. Quote contains current market data about an asset
 // 3. QuoteSummary contains extensive data about an asset based on the selected QueryParam. Because of how varied the data can be, the response is returned as a map[string]any. The plan is eventually to provide individual structs for each response type.
-//
 package yfi
 
 import (
@@ -19,10 +18,9 @@ import (
 )
 
 const (
-	V1 = `https://query2.finance.yahoo.com/v1/finance/`
-	V6 = `https://query2.finance.yahoo.com/v6/finance/`
-	V7 = `https://query2.finance.yahoo.com/v7/finance/`
-	//V8      = `https://query2.finance.yahoo.com/v8/finance/`
+	V1      = `https://query2.finance.yahoo.com/v1/finance/`
+	V6      = `https://query2.finance.yahoo.com/v6/finance/`
+	V7      = `https://query2.finance.yahoo.com/v7/finance/`
 	V10     = `https://query2.finance.yahoo.com/v10/finance/`
 	TIMEOUT = 5 * time.Second
 	// The default net/http user-agent is blocked for some Yahoo Finance endpoints
