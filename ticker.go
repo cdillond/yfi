@@ -75,9 +75,9 @@ func (t *Ticker) ToCsv(filename string) error {
 
 // Retrieve historical data for a given ticker.
 // The response is a Ticker and an error.
-func (c *Client) GetTicker(ticker string, interval TimeSpan, startDate, endDate time.Time) (Ticker, error) {
+func (c *Client) GetTicker(symbol string, interval TimeSpan, startDate, endDate time.Time) (Ticker, error) {
 	var res Ticker
-	res.Symbol = ticker
+	res.Symbol = symbol
 	err := validateInterval(interval)
 	if err != nil {
 		res.Err = err
@@ -93,7 +93,7 @@ func (c *Client) GetTicker(ticker string, interval TimeSpan, startDate, endDate 
 	}
 
 	// currently using V7; but others can be used too; perhaps V8
-	url := V7 + "download/" + ticker +
+	url := V7 + "download/" + symbol +
 		"?period1=" + strconv.Itoa(int(startDate.Unix())) +
 		"&period2=" + strconv.Itoa(int(endDate.Unix())) +
 		"&interval=" + string(interval) + "&includeAdjustedClose=true"
@@ -140,7 +140,7 @@ func (c *Client) GetTicker(ticker string, interval TimeSpan, startDate, endDate 
 
 	lr := len(records)
 
-	res.Symbol = ticker
+	res.Symbol = symbol
 	res.HistoricDates = make([]int64, lr) //make([]time.Time, lr)
 	res.HistoricAdjClose = make([]float64, lr)
 	res.HistoricClose = make([]float64, lr)
@@ -163,13 +163,13 @@ func (c *Client) GetTicker(ticker string, interval TimeSpan, startDate, endDate 
 // Returns historical data for multiple tickers.
 // Each request is followed by a WaitPeriod to reduce the risk of rate limiting.
 // errors are included in each Ticker and are not returned separately.
-func (c *Client) GetTickers(tickers []string, interval TimeSpan, startDate, endDate time.Time) []Ticker {
-	res := make([]Ticker, len(tickers))
-	for i := 0; i < len(tickers); i++ {
-		t, err := c.GetTicker(tickers[i], interval, startDate, endDate)
+func (c *Client) GetTickers(symbols []string, interval TimeSpan, startDate, endDate time.Time) []Ticker {
+	res := make([]Ticker, len(symbols))
+	for i := 0; i < len(symbols); i++ {
+		t, err := c.GetTicker(symbols[i], interval, startDate, endDate)
 		res[i] = t
 		if c.Verbose {
-			log.Println(tickers[i], i, len(tickers), err)
+			log.Println(symbols[i], i, len(symbols), err)
 		}
 		time.Sleep(c.WaitPeriod)
 	}
@@ -184,9 +184,9 @@ func (c *Client) GetTickers(tickers []string, interval TimeSpan, startDate, endD
 // The context timeout for each request is set to the greater of 30 seconds or the current Client.TimeOut
 // to avoid excessive errors when a large number of requests are made. This behavior can be disabled
 // by setting the Client.HardTimeOut value to true.
-func (c *Client) GetTickersBurst(tickers []string, interval TimeSpan, startDate, endDate time.Time) []Ticker {
-	res := make([]Ticker, len(tickers))
-	resch := make(chan burstResp, len(tickers))
+func (c *Client) GetTickersBurst(symbols []string, interval TimeSpan, startDate, endDate time.Time) []Ticker {
+	res := make([]Ticker, len(symbols))
+	resch := make(chan burstResp, len(symbols))
 
 	timeout := c.TimeOut
 	if !c.HardTimeOut {
@@ -195,14 +195,14 @@ func (c *Client) GetTickersBurst(tickers []string, interval TimeSpan, startDate,
 		}
 	}
 
-	for i := 0; i < len(tickers); i++ {
+	for i := 0; i < len(symbols); i++ {
 		time.Sleep(c.WaitPeriod)
 		go func(j int) {
-			br := c.burstTickerHist(tickers[j], interval, startDate, endDate, timeout, j)
+			br := c.burstTickerHist(symbols[j], interval, startDate, endDate, timeout, j)
 			resch <- br
 		}(i)
 	}
-	for i := 0; i < len(tickers); i++ {
+	for i := 0; i < len(symbols); i++ {
 		br := <-resch
 		res[br.index] = *br.ticker
 		if c.Verbose {
@@ -216,9 +216,9 @@ func (c *Client) GetTickersBurst(tickers []string, interval TimeSpan, startDate,
 }
 
 // Retrieve historical data for a given ticker.
-func (c *Client) burstTickerHist(ticker string, interval TimeSpan, startDate, endDate time.Time, timeout time.Duration, index int) burstResp {
+func (c *Client) burstTickerHist(symbol string, interval TimeSpan, startDate, endDate time.Time, timeout time.Duration, index int) burstResp {
 	var res Ticker
-	res.Symbol = ticker
+	res.Symbol = symbol
 	err := validateInterval(interval)
 	if err != nil {
 		res.Err = err
@@ -232,10 +232,10 @@ func (c *Client) burstTickerHist(ticker string, interval TimeSpan, startDate, en
 		return burstResp{&res, index}
 	}
 	if c.Verbose {
-		log.Println(ticker)
+		log.Println(symbol)
 	}
 
-	url := V7 + "download/" + ticker +
+	url := V7 + "download/" + symbol +
 		"?period1=" + strconv.Itoa(int(startDate.Unix())) +
 		"&period2=" + strconv.Itoa(int(endDate.Unix())) +
 		"&interval=" + string(interval) + "&includeAdjustedClose=true"
@@ -283,7 +283,7 @@ func (c *Client) burstTickerHist(ticker string, interval TimeSpan, startDate, en
 
 	lr := len(records)
 
-	res.Symbol = ticker
+	res.Symbol = symbol
 	res.HistoricDates = make([]int64, lr) //make([]time.Time, lr)
 	res.HistoricAdjClose = make([]float64, lr)
 	res.HistoricClose = make([]float64, lr)
