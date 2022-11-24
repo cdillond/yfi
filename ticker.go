@@ -177,10 +177,8 @@ func (c *Client) GetTickers(symbols []string, interval TimeSpan, startDate, endD
 }
 
 // GetTickersBurst sends requests to the Yahoo Finance API that are spaced
-// out by the WaitPeriod, regardless of whether reponses to previous
-// requests have been received.
-// No precautions are taken to reduce the risk of rate limiting.
-// errors are included in the body of the Ticker and are not returned separately
+// out by the WaitPeriod, regardless of whether reponses to previous requests have been received.
+// errors are included in the body of the Ticker and are not returned separately.
 // The context timeout for each request is set to the greater of 30 seconds or the current Client.TimeOut
 // to avoid excessive errors when a large number of requests are made. This behavior can be disabled
 // by setting the Client.HardTimeOut value to true.
